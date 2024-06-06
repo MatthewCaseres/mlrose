@@ -5,6 +5,7 @@
 # License: BSD 3 clause
 
 import numpy as np
+import timeit
 
 from mlrose_hiive.decorators import short_name
 
@@ -90,6 +91,7 @@ def random_hill_climb(problem, max_attempts=10, max_iters=np.inf, restarts=0,
 
     continue_iterating = True
     problem.reset()
+    t1 = timeit.default_timer()
     for current_restart in range(restarts + 1):
         # Initialize optimization problem and attempts counter
         fevals = problem.fitness_evaluations
@@ -131,7 +133,7 @@ def random_hill_climb(problem, max_attempts=10, max_iters=np.inf, restarts=0,
 
             if curve:
                 adjusted_fitness = problem.get_adjusted_fitness()
-                curve_value = (adjusted_fitness, problem.fitness_evaluations)
+                curve_value = (adjusted_fitness, problem.fitness_evaluations, timeit.default_timer() - t1)
                 fitness_curve.append(curve_value)
                 all_curves.append(curve_value)
                 """

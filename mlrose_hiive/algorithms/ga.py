@@ -5,6 +5,7 @@
 # License: BSD 3 clause
 
 import numpy as np
+import timeit
 
 from mlrose_hiive.decorators import short_name
 
@@ -143,9 +144,11 @@ def genetic_alg(problem, pop_size=200, pop_breed_percent=0.75, elite_dreg_ratio=
 
     fitness_curve = []
 
+
     # Initialize problem, population and attempts counter
     problem.reset()
     problem.random_pop(pop_size)
+
     if state_fitness_callback is not None:
         # initial call with base data
         state_fitness_callback(iteration=0,
@@ -176,6 +179,9 @@ def genetic_alg(problem, pop_size=200, pop_breed_percent=0.75, elite_dreg_ratio=
         breeding_pop_size -= over_population
 
     continue_iterating = True
+
+        # measure the time
+    t1 = timeit.default_timer()
     while (attempts < max_attempts) and (problem.fitness_evaluations < max_iters):
         iters += 1
         problem.current_iteration += 1
@@ -222,7 +228,7 @@ def genetic_alg(problem, pop_size=200, pop_breed_percent=0.75, elite_dreg_ratio=
             attempts += 1
 
         if curve:
-            fitness_curve.append((problem.get_adjusted_fitness(), problem.fitness_evaluations))
+            fitness_curve.append((problem.get_adjusted_fitness(), problem.fitness_evaluations, timeit.default_timer() - t1))
 
         # invoke callback
         if state_fitness_callback is not None:
