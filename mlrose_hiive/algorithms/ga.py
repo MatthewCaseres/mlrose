@@ -176,7 +176,7 @@ def genetic_alg(problem, pop_size=200, pop_breed_percent=0.75, elite_dreg_ratio=
         breeding_pop_size -= over_population
 
     continue_iterating = True
-    while (attempts < max_attempts) and (iters < max_iters):
+    while (attempts < max_attempts) and (problem.fitness_evaluations < max_iters):
         iters += 1
         problem.current_iteration += 1
 
