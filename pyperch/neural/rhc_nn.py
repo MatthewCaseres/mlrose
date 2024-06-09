@@ -16,6 +16,7 @@ from skorch import NeuralNet
 from pyperch.utils.decorators import add_to
 from skorch.dataset import unpack_data
 import copy
+import timeit
 
 
 class RHCModule(nn.Module):
@@ -63,6 +64,9 @@ class RHCModule(nn.Module):
         self.output_activation = output_activation
         self.layers = nn.ModuleList()
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.time_start = timeit.default_timer()
+        self.eval_count = 0
+        self.time_map = {}
 
         # input layer
         self.layers.append(nn.Linear(self.input_dim, self.hidden_units, device=self.device))
@@ -142,6 +146,9 @@ class RHCModule(nn.Module):
             net.load_params(f_params='rhc_model_params.pt', f_optimizer='rhc_optimizer_params.pt')
             new_y_pred = y_pred
             new_loss = loss
+        
+        self.eval_count += 1
+        self.time_map[self.eval_count] = timeit.default_timer() - self.time_start
 
         return new_loss, new_y_pred
 
