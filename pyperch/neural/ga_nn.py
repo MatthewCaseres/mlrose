@@ -15,10 +15,12 @@ from skorch import NeuralNet
 from pyperch.utils.decorators import add_to
 from skorch.dataset import unpack_data
 from copy import deepcopy
+import timeit
+import math
 
 
 class GAModule(nn.Module):
-    def __init__(self, input_dim, output_dim, population_size=300, to_mate=150, to_mutate=50, hidden_units=10, hidden_layers=1,
+    def __init__(self, input_dim, output_dim, population_size=300, mate_pct=.5, mutate_pct=.5, hidden_units=10, hidden_layers=1,
                  dropout_percent=0, step_size=.1, activation=nn.ReLU(), output_activation=nn.Softmax(dim=-1)):
         """
 
@@ -72,9 +74,10 @@ class GAModule(nn.Module):
         self.layers = nn.ModuleList()
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.population_size = population_size
-        self.to_mate = to_mate
-        self.to_mutate = to_mutate
+        self.to_mate = math.ceil(population_size * mate_pct)
+        self.to_mutate = math.ceil(population_size * mutate_pct)
         self.population = None
+        self.t1 = timeit.default_timer()
 
         # input layer
         self.layers.append(nn.Linear(self.input_dim, self.hidden_units, device=self.device))
@@ -214,6 +217,8 @@ class GAModule(nn.Module):
         # calc old loss
         y_pred = net.infer(X_train, **fit_params)
         loss = net.get_loss(y_pred, y_train, X_train, training=False)
+        if timeit.default_timer() - self.t1 > 60:
+            return loss, y_pred
 
         model = net.module_
         data = X_train
