@@ -217,7 +217,7 @@ class GAModule(nn.Module):
         # calc old loss
         y_pred = net.infer(X_train, **fit_params)
         loss = net.get_loss(y_pred, y_train, X_train, training=False)
-        if timeit.default_timer() - self.t1 > 60:
+        if timeit.default_timer() - self.t1 > 6000:
             return loss, y_pred
 
         model = net.module_
